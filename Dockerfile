@@ -127,5 +127,8 @@ RUN /usr/local/bin/install-plugins.sh       \
   workflow-step-api:2.9          \
   workflow-support:2.14
 
+# disable first-run wizard
+RUN echo 2.0 > ${JENKINS_STAGING}/jenkins.install.UpgradeWizard.state
+
 RUN export LD_LIBRARY_PATH=/libmesos-bundle/lib:/libmesos-bundle/lib/mesos:$LD_LIBRARY_PATH \
   && export MESOS_NATIVE_JAVA_LIBRARY=$(ls /libmesos-bundle/lib/libmesos-*.so)
