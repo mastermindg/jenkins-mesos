@@ -129,7 +129,7 @@ RUN /usr/local/bin/install-plugins.sh       \
 RUN echo 2.0 > ${JENKINS_STAGING}/jenkins.install.UpgradeWizard.state
 
 # RUN export LD_LIBRARY_PATH=/libmesos-bundle/lib:/libmesos-bundle/lib/mesos:$LD_LIBRARY_PATH \
-  && export MESOS_NATIVE_JAVA_LIBRARY=$(ls /libmesos-bundle/lib/libmesos-*.so)
+#  && export MESOS_NATIVE_JAVA_LIBRARY=$(ls /libmesos-bundle/lib/libmesos-*.so)
 
 CMD export LD_LIBRARY_PATH=/libmesos-bundle/lib:/libmesos-bundle/lib/mesos:$LD_LIBRARY_PATH \
   && export MESOS_NATIVE_JAVA_LIBRARY=$(ls /libmesos-bundle/lib/libmesos-*.so)   \
@@ -146,5 +146,5 @@ CMD export LD_LIBRARY_PATH=/libmesos-bundle/lib:/libmesos-bundle/lib/mesos:$LD_L
      --httpListenAddress=127.0.0.1                   \
      --ajp13ListenAddress=127.0.0.1                  \
      --username=admin                                \
-     --password-file=/var/jenkins_home/secrets/initialAdminPassword
+     --password-file=/var/jenkins_home/secrets/initialAdminPassword \
      --prefix=${JENKINS_CONTEXT}
