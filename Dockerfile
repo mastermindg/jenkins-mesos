@@ -8,6 +8,10 @@ WORKDIR /tmp
 #                   has a chance to create the host-container volume mapping.
 #
 ENV JENKINS_FOLDER /usr/share/jenkins
+ENV JENKINS_AGENT_USER root
+ENV JENKINS_AGENT_ROLE "hsperfdata_root jetty-127.0.0.1-10153-war-_service_jenkins-any-5386151702589786660.dir jffi5983869142098962528.tmp jna-3506402 winstone6167370634714965887.jar"
+ENV PORT0 10152
+ENV PORT1 10153
 
 # Build Args
 ARG LIBMESOS_DOWNLOAD_URL=https://downloads.mesosphere.com/libmesos-bundle/libmesos-bundle-1.8.7-1.0.2-2.tar.gz
