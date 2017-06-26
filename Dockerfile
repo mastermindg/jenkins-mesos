@@ -110,11 +110,9 @@ RUN /usr/local/bin/install-plugins.sh       \
   scm-api:2.1.1                  \
   ssh-agent:1.15                 \
   ssh-slaves:1.17                \
-  subversion:2.7.2               \
   timestamper:1.8.8              \
   translation:1.15               \
   variant:1.1                    \
-  windows-slaves:1.3.1           \
   workflow-aggregator:2.5        \
   workflow-api:2.13              \
   workflow-basic-steps:2.4       \
@@ -130,5 +128,23 @@ RUN /usr/local/bin/install-plugins.sh       \
 # disable first-run wizard
 RUN echo 2.0 > ${JENKINS_STAGING}/jenkins.install.UpgradeWizard.state
 
-RUN export LD_LIBRARY_PATH=/libmesos-bundle/lib:/libmesos-bundle/lib/mesos:$LD_LIBRARY_PATH \
+# RUN export LD_LIBRARY_PATH=/libmesos-bundle/lib:/libmesos-bundle/lib/mesos:$LD_LIBRARY_PATH \
   && export MESOS_NATIVE_JAVA_LIBRARY=$(ls /libmesos-bundle/lib/libmesos-*.so)
+
+CMD export LD_LIBRARY_PATH=/libmesos-bundle/lib:/libmesos-bundle/lib/mesos:$LD_LIBRARY_PATH \
+  && export MESOS_NATIVE_JAVA_LIBRARY=$(ls /libmesos-bundle/lib/libmesos-*.so)   \
+  && java ${JVM_OPTS}                                \
+     -Dhudson.udp=-1                                 \
+     -Djava.awt.headless=true                        \
+     -Dhudson.DNSMultiCast.disabled=true             \
+     -Djenkins.install.runSetupWizard=false          \
+     -jar ${JENKINS_FOLDER}/jenkins.war              \
+     ${JENKINS_OPTS}                                 \
+     --httpPort=${PORT1}                             \
+     --webroot=${JENKINS_FOLDER}/war                 \
+     --ajp13Port=-1                                  \
+     --httpListenAddress=127.0.0.1                   \
+     --ajp13ListenAddress=127.0.0.1                  \
+     --username=admin                                \
+     --password-file=/var/jenkins_home/secrets/initialAdminPassword
+     --prefix=${JENKINS_CONTEXT}
