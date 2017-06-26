@@ -12,12 +12,14 @@ ENV JENKINS_FOLDER /usr/share/jenkins
 # Build Args
 ARG LIBMESOS_DOWNLOAD_URL=https://downloads.mesosphere.com/libmesos-bundle/libmesos-bundle-1.8.7-1.0.2-2.tar.gz
 ARG LIBMESOS_DOWNLOAD_SHA256=9757b2e86c975488f68ce325fdf08578669e3c0f1fcccf24545d3bd1bd423a25
+ARG BLUEOCEAN_VERSION=1.0.1
 ARG JENKINS_STAGING=/usr/share/jenkins/ref/
+ARG PORT1=8080
 
 USER root
 
 # install dependencies
-RUN apt-get update && apt-get install -y nginx python zip jq
+RUN apt-get update && apt-get install -y python zip jq
 # libmesos bundle
 RUN curl -fsSL "$LIBMESOS_DOWNLOAD_URL" -o libmesos-bundle.tar.gz  \
   && echo "$LIBMESOS_DOWNLOAD_SHA256 libmesos-bundle.tar.gz" | sha256sum -c - \
@@ -31,19 +33,11 @@ RUN echo "deb http://ftp.debian.org/debian testing main" >> /etc/apt/sources.lis
 RUN echo 'networkaddress.cache.ttl=60' >> ${JAVA_HOME}/jre/lib/security/java.security
 
 # bootstrap scripts and needed dir setup
-COPY scripts/bootstrap.py /usr/local/jenkins/bin/bootstrap.py
-COPY scripts/export-libssl.sh /usr/local/jenkins/bin/export-libssl.sh
-COPY scripts/dcos-account.sh /usr/local/jenkins/bin/dcos-account.sh
 RUN mkdir -p "$JENKINS_HOME" "${JENKINS_FOLDER}/war"
 
-# nginx setup
-RUN mkdir -p /var/log/nginx/jenkins
-COPY conf/nginx/nginx.conf /etc/nginx/nginx.conf
-
 # jenkins setup
-COPY conf/jenkins/config.xml "${JENKINS_STAGING}/config.xml"
-COPY conf/jenkins/jenkins.model.JenkinsLocationConfiguration.xml "${JENKINS_STAGING}/jenkins.model.JenkinsLocationConfiguration.xml"
-COPY conf/jenkins/nodeMonitors.xml "${JENKINS_STAGING}/nodeMonitors.xml"
+COPY conf/config.xml "${JENKINS_STAGING}/config.xml"
+COPY conf/nodeMonitors.xml "${JENKINS_STAGING}/nodeMonitors.xml"
 
 # add plugins
 RUN /usr/local/bin/install-plugins.sh       \
@@ -117,11 +111,9 @@ RUN /usr/local/bin/install-plugins.sh       \
   scm-api:2.1.1                  \
   ssh-agent:1.15                 \
   ssh-slaves:1.17                \
-  subversion:2.7.2               \
   timestamper:1.8.8              \
   translation:1.15               \
   variant:1.1                    \
-  windows-slaves:1.3.1           \
   workflow-aggregator:2.5        \
   workflow-api:2.13              \
   workflow-basic-steps:2.4       \
@@ -135,13 +127,13 @@ RUN /usr/local/bin/install-plugins.sh       \
   workflow-support:2.14
 
 # disable first-run wizard
-RUN echo 2.0 > /usr/share/jenkins/ref/jenkins.install.UpgradeWizard.state
+RUN echo 2.0 > ${JENKINS_STAGING}/jenkins.install.UpgradeWizard.state
+
+# RUN export LD_LIBRARY_PATH=/libmesos-bundle/lib:/libmesos-bundle/lib/mesos:$LD_LIBRARY_PATH \
+#  && export MESOS_NATIVE_JAVA_LIBRARY=$(ls /libmesos-bundle/lib/libmesos-*.so)
 
 CMD export LD_LIBRARY_PATH=/libmesos-bundle/lib:/libmesos-bundle/lib/mesos:$LD_LIBRARY_PATH \
   && export MESOS_NATIVE_JAVA_LIBRARY=$(ls /libmesos-bundle/lib/libmesos-*.so)   \
-  && . /usr/local/jenkins/bin/export-libssl.sh       \
-  && /usr/local/jenkins/bin/bootstrap.py && nginx    \
-  && . /usr/local/jenkins/bin/dcos-account.sh        \
   && java ${JVM_OPTS}                                \
      -Dhudson.udp=-1                                 \
      -Djava.awt.headless=true                        \
@@ -149,7 +141,7 @@ CMD export LD_LIBRARY_PATH=/libmesos-bundle/lib:/libmesos-bundle/lib/mesos:$LD_L
      -Djenkins.install.runSetupWizard=false          \
      -jar ${JENKINS_FOLDER}/jenkins.war              \
      ${JENKINS_OPTS}                                 \
-     --httpPort=${PORT1}                             \
+     --httpPort=8080                                 \
      --webroot=${JENKINS_FOLDER}/war                 \
      --ajp13Port=-1                                  \
      --httpListenAddress=127.0.0.1                   \
