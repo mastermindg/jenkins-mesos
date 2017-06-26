@@ -141,7 +141,7 @@ CMD export LD_LIBRARY_PATH=/libmesos-bundle/lib:/libmesos-bundle/lib/mesos:$LD_L
      -Djenkins.install.runSetupWizard=false          \
      -jar ${JENKINS_FOLDER}/jenkins.war              \
      ${JENKINS_OPTS}                                 \
-     --httpPort=${PORT1}                             \
+     --httpPort=8080                                 \
      --webroot=${JENKINS_FOLDER}/war                 \
      --ajp13Port=-1                                  \
      --httpListenAddress=127.0.0.1                   \
