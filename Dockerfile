@@ -10,13 +10,11 @@ WORKDIR /tmp
 ENV JENKINS_FOLDER /usr/share/jenkins
 ENV JENKINS_AGENT_USER root
 ENV JENKINS_AGENT_ROLE "hsperfdata_root jetty-127.0.0.1-10153-war-_service_jenkins-any-5386151702589786660.dir jffi5983869142098962528.tmp jna-3506402 winstone6167370634714965887.jar"
-ENV PORT0 10152
-ENV PORT1 10153
 ENV JENKINS_FRAMEWORK_NAME jenkins
 ENV JENKINS_CONTEXT /service/jenkins
-ENV HOST 192.168.1.40
 ENV JENKINS_MESOS_MASTER zk://leader.mesos:2181/mesos
 ENV SSH_KNOWN_HOSTS "github.com gitlab.com"
+ENV PASSWORD=changeme
 
 # Build Args
 ARG LIBMESOS_DOWNLOAD_URL=https://downloads.mesosphere.com/libmesos-bundle/libmesos-bundle-1.8.7-1.0.2-2.tar.gz
@@ -163,6 +161,6 @@ CMD export LD_LIBRARY_PATH=/libmesos-bundle/lib:/libmesos-bundle/lib/mesos:$LD_L
      --ajp13Port=-1                                  \
      --httpListenAddress=127.0.0.1                   \
      --ajp13ListenAddress=127.0.0.1                  \
-     --argumentsRealm.passwd.admin=password          \
+     --argumentsRealm.passwd.admin=${PASSWORD}       \
      --argumentsRealm.roles.user=admin               \
      --prefix=${JENKINS_CONTEXT}
